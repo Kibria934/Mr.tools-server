@@ -20,12 +20,15 @@ async function run() {
   try {
     await client.connect();
     const toolsCollection = client.db("allTools").collection("tools");
+    const reviewCollection = client.db("reviews").collection("review");
 
     // ---------- getting tools API --------------
     app.get("/get-tools", async (req, res) => {
-      const result = await toolsCollection.find().toArray();
+      const result = await toolsCollection.find({}).toArray();
       res.send(result);
     });
+
+    
   } finally {
   }
 }
