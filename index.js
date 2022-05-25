@@ -49,7 +49,7 @@ async function run() {
     const verifyAdmin = async (req, res, next) => {
       const requester = req.decoded.email;
       const requesterAccount = await userCollection.findOne({
-        email: requester
+        email: requester,
       });
       if (requesterAccount.rol === "admin") {
         next();
@@ -59,7 +59,7 @@ async function run() {
     };
     // ---------- getting tools API --------------
     app.get("/get-tools", async (req, res) => {
-      const result = await toolsCollection.find({}).sort({_id:-1}).toArray();
+      const result = await toolsCollection.find({}).sort({ _id: -1 }).toArray();
       res.send(result);
     });
 
@@ -87,6 +87,12 @@ async function run() {
       );
       res.send(result);
     });
+    app.delete("/delete-tool/:id", verifyJWT, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await toolsCollection.deleteOne(query);
+      res.send(result);
+    });
 
     app.post("/post-order", async (req, res) => {
       const user = req.body;
@@ -106,7 +112,7 @@ async function run() {
         res.status(403).send({ message: "forbidden" });
       }
     });
-    app.post('/post-tools', verifyJWT, verifyAdmin, async (req, res) => {
+    app.post("/post-tools", verifyJWT, verifyAdmin, async (req, res) => {
       const product = req.body;
       const result = await toolsCollection.insertOne(product);
       res.send(result);
@@ -130,7 +136,7 @@ async function run() {
       res.send(updatedBooking);
     });
 
-    app.delete("/delete-order/:id", async (req, res) => {
+    app.delete("/delete-order/:id",verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
