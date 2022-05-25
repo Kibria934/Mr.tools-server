@@ -59,7 +59,7 @@ async function run() {
     };
     // ---------- getting tools API --------------
     app.get("/get-tools", async (req, res) => {
-      const result = await toolsCollection.find({}).toArray();
+      const result = await toolsCollection.find({}).sort({_id:-1}).toArray();
       res.send(result);
     });
 
@@ -91,7 +91,6 @@ async function run() {
     app.post("/post-order", async (req, res) => {
       const user = req.body;
       const auth = req.headers.authorization;
-      console.log(auth);
       const result = await orderCollection.insertOne(user);
       res.send(result);
     });
@@ -106,6 +105,11 @@ async function run() {
       } else {
         res.status(403).send({ message: "forbidden" });
       }
+    });
+    app.post('/post-tools', verifyJWT, verifyAdmin, async (req, res) => {
+      const product = req.body;
+      const result = await toolsCollection.insertOne(product);
+      res.send(result);
     });
 
     app.patch("/order/:id", verifyJWT, async (req, res) => {
