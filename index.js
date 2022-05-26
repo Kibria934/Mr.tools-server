@@ -87,12 +87,16 @@ async function run() {
       );
       res.send(result);
     });
+
+
     app.delete("/delete-tool/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await toolsCollection.deleteOne(query);
       res.send(result);
     });
+
+
 
     app.post("/post-order", async (req, res) => {
       const user = req.body;
@@ -128,6 +132,8 @@ async function run() {
       }
     );
 
+
+
     app.get("/get-order", verifyJWT, async (req, res) => {
       const email = req.query.email;
       const decodedEmail = req.decoded.email;
@@ -139,6 +145,8 @@ async function run() {
         res.status(403).send({ message: "forbidden" });
       }
     });
+
+
     app.post("/post-tools", verifyJWT, verifyAdmin, async (req, res) => {
       const product = req.body;
       const result = await toolsCollection.insertOne(product);
@@ -228,6 +236,7 @@ async function run() {
       const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, {
         expiresIn: "1d",
       });
+console.log(token);
 
       res.send({ result, token });
     });
