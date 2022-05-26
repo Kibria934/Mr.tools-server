@@ -101,6 +101,11 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/get-allOrder", verifyJWT, verifyAdmin, async (req, res) => {
+      const result = await orderCollection.find().sort({ _id: -1 }).toArray();
+      res.send(result);
+    });
+
     app.get("/get-order", verifyJWT, async (req, res) => {
       const email = req.query.email;
       const decodedEmail = req.decoded.email;
@@ -136,7 +141,7 @@ async function run() {
       res.send(updatedBooking);
     });
 
-    app.delete("/delete-order/:id",verifyJWT, async (req, res) => {
+    app.delete("/delete-order/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
