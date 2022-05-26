@@ -10,6 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// --------------- DB INFORMATION ------------
 const uri = `mongodb+srv://kibriaHossain:${process.env.DB_PASS}@cluster0.rv53t.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -57,7 +58,8 @@ async function run() {
         res.status(403).send({ message: "forbidden" });
       }
     };
-    // ---------- getting tools API --------------
+
+    // ---------- TOOLS API --------------
     app.get("/get-tools", async (req, res) => {
       const result = await toolsCollection.find({}).sort({ _id: -1 }).toArray();
       res.send(result);
@@ -88,7 +90,6 @@ async function run() {
       res.send(result);
     });
 
-
     app.delete("/delete-tool/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
@@ -96,8 +97,13 @@ async function run() {
       res.send(result);
     });
 
+    app.post("/post-tools", verifyJWT, verifyAdmin, async (req, res) => {
+      const product = req.body;
+      const result = await toolsCollection.insertOne(product);
+      res.send(result);
+    });
 
-
+    // -----------  ORDER API -----------------
     app.post("/post-order", async (req, res) => {
       const user = req.body;
       const auth = req.headers.authorization;
@@ -132,8 +138,6 @@ async function run() {
       }
     );
 
-
-
     app.get("/get-order", verifyJWT, async (req, res) => {
       const email = req.query.email;
       const decodedEmail = req.decoded.email;
@@ -144,13 +148,6 @@ async function run() {
       } else {
         res.status(403).send({ message: "forbidden" });
       }
-    });
-
-
-    app.post("/post-tools", verifyJWT, verifyAdmin, async (req, res) => {
-      const product = req.body;
-      const result = await toolsCollection.insertOne(product);
-      res.send(result);
     });
 
     app.patch("/order/:id", verifyJWT, async (req, res) => {
@@ -178,7 +175,7 @@ async function run() {
       res.send(result);
     });
 
-    // ------------- review -------------
+    // ------------- REVIEW API -------------
     app.put("/review", verifyJWT, async (req, res) => {
       const email = req.query.email;
       const review = req.body;
@@ -206,10 +203,10 @@ async function run() {
       const result = await orderCollection.findOne(query);
       res.send(result);
     });
+
     // ------------ payment method----------
     app.post("/create-payment-intent", verifyJWT, async (req, res) => {
       const order = req.body;
-      console.log(order);
       const price = order.totalPrice;
       const amount = price * 100;
       const paymentIntent = await stripe.paymentIntents.create({
@@ -220,6 +217,7 @@ async function run() {
       res.send({ clientSecret: paymentIntent.client_secret });
     });
 
+    // ------------ USER API ---------------
     app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
@@ -236,7 +234,6 @@ async function run() {
       const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN, {
         expiresIn: "1d",
       });
-console.log(token);
 
       res.send({ result, token });
     });
@@ -274,7 +271,8 @@ console.log(token);
       res.send(result);
     });
 
-    // ------------- make admin --------------
+
+    // ------------- ADMIN API --------------
     app.put("/admin/:email", verifyJWT, verifyAdmin, async (req, res) => {
       const email = req.params.email;
       const filter = { email: email };
@@ -294,10 +292,15 @@ console.log(token);
       const isAdmin = user.rol === "admin";
       res.send({ admin: isAdmin });
     });
+
+
+
   } finally {
   }
 }
 run().catch((error) => console.log(error));
+
+// -------------HOME API--------------
 
 app.get("/", (req, res) => {
   res.send("Electro-Parts here");
