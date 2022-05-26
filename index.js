@@ -106,18 +106,27 @@ async function run() {
       res.send(result);
     });
 
-    app.put('/update-allOrder/:id',verifyJWT,verifyAdmin, async(req,res)=>{
-      const id = req.params.id;
-      const filter = {_id:ObjectId(id)};
-      const options={upsert:true};
-      updateDoc={
-        $set:{
-          status:'shiped'
-        },
-      };
-      const result = await orderCollection.updateOne(filter,updateDoc,options);
-      res.send(result)
-        })
+    app.put(
+      "/update-allOrder/:id",
+      verifyJWT,
+      verifyAdmin,
+      async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: ObjectId(id) };
+        const options = { upsert: true };
+        updateDoc = {
+          $set: {
+            status: "shiped",
+          },
+        };
+        const result = await orderCollection.updateOne(
+          filter,
+          updateDoc,
+          options
+        );
+        res.send(result);
+      }
+    );
 
     app.get("/get-order", verifyJWT, async (req, res) => {
       const email = req.query.email;
