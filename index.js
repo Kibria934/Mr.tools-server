@@ -7,7 +7,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const app = express();
 
-app.use(cors({ origin: "https://mrtools-bf4da.web.app/" }));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 // --------------- DB INFORMATION ------------
