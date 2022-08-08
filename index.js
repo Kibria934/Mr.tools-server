@@ -7,7 +7,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: "https://mrtools-bf4da.web.app/" }));
 app.use(express.json());
 
 // --------------- DB INFORMATION ------------
@@ -272,7 +272,6 @@ async function run() {
       res.send(result);
     });
 
-
     // ------------- ADMIN API --------------
     app.put("/admin/:email", verifyJWT, verifyAdmin, async (req, res) => {
       const email = req.params.email;
@@ -293,9 +292,6 @@ async function run() {
       const isAdmin = user.rol === "admin";
       res.send({ admin: isAdmin });
     });
-
-
-
   } finally {
   }
 }
