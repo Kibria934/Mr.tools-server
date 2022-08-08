@@ -19,7 +19,7 @@ const client = new MongoClient(uri, {
 });
 
 // --------- jwt verify -----------
-// =================================
+// ================================
 const verifyJWT = (req, res, next) => {
   const auth = req.headers.authorization;
   if (!auth) {
